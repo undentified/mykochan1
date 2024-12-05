@@ -1,0 +1,259 @@
+
+
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/settings_styles.css') }}">
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+<link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.10.5/font/bootstrap-icons.min.css" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<title>Slee</title>
+
+
+{% block content %}
+ <div class="container mt-5">
+    <h2>Survey Form - Student Learning Experience Evaluation</h2>
+    <form action="/submit" method="POST">
+      
+      <div class="mb-3">
+        <label for="name" class="form-label"><strong>Email</strong></label>
+        <input type="email" class="form-control" id="email" name="email" placeholder="name@example.com" required>
+      </div>
+
+      <div class="mb-3">
+        <label for="idnumber" class="form-label"><strong>ID Number</strong></label>
+        <input type="text" class="form-control" id="idnumber" name="idnumber">
+      </div>
+
+      <div class="mb-3">
+        <label for="campus" class="form-label"><strong>Campus</strong></label>
+        <select class="form-select" aria-label="Default select example" id="campus" name="campus" required>
+          <option selected>Open this select menu</option>
+          {% for campus in campus %}
+          <option value="{{ campus.campus }}">{{ campus.campus }}</option>
+      {% endfor %}
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="college" class="form-label"><strong>College/Department</strong></label>
+        <select class="form-select" id="college" name="college" required>
+          <option selected disabled>Open this select menu</option>
+          {% for college in colleges %}
+              <option value="{{ college.college }}" data-campus="{{ college.campus }}">
+                  {{ college.college }}
+              </option>
+          {% endfor %}
+        </select>
+
+      </div>
+      <div class="mb-3">
+        <label for="program" class="form-label"><strong>Program</strong></label>
+        <select class="form-select" id="program" name="program" required>
+          <option selected disabled>Open this select menu</option>
+          {% for program in program %}
+              <option value="{{ program.program }}" data-college="{{ program.college }}">
+                  {{ program.program }}
+              </option>
+          {% endfor %}
+      </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="year" class="form-label"><strong>Year Level</strong></label>
+        <select class="form-select" aria-label="Default select example" id="year" name="year" required>
+          <option selected>Open this select menu</option>
+          <option>I</option>
+          <option>II</option>
+          <option>III</option>
+          <option>IV</option>
+          <option>V</option>
+        </select>
+      </div>
+
+      <div class="mb-3">
+        <label for="faculty" class="form-label"><strong>Faculty</strong></label>
+        <select class="form-select" id="faculty" name="faculty" required>
+          <option selected disabled>Open this select menu</option>
+          {% for faculty in faculty %}
+              <option value="{{ faculty.faculty }}" data-college="{{ faculty.college }}">
+                  {{ faculty.faculty }}
+              </option>
+          {% endfor %}
+      </select>
+      </div>
+
+       <!-- SEPARATE -->
+       <hr style="border: 10px solid #72281e; margin: 10px 0; border-radius: 10px;">
+       <h6>Please evaluate your subject instructor/professor objectively using the scale below.</h6>
+       <img src="static/scale.png" alt="Scale" class="img-fluid rounded">
+      <h4>A. Commitment</h4>
+
+      {% for question in questions %}
+      <div class="mb-3 d-flex align-items-center">
+          <label class="form-label d-block" style="width: 150px; white-space: normal;">{{ question.text }}</label>
+          <div class="ms-3">
+              {% for choice in range(1, 6) %}
+                  <div class="form-check form-check-inline">
+                      <input class="form-check-input" type="radio" name="question_{{ question.id }}" id="question_{{ question.id }}" value="{{ choice }}" required>
+                      <label class="form-check-label" for="question_{{ question.id }}">
+                          {{ choice }}
+                      </label>
+                  </div>
+              {% endfor %}
+          </div>
+      </div>
+  {% endfor %}
+    
+        <!-- SEPARATE -->
+        <hr style="border: 10px solid #72281e; margin: 10px 0; border-radius: 10px;">
+      <h4>B. Knowledge of Subject</h4>
+      
+      {% for question in questionsb %} 
+        <div class="mb-3 d-flex align-items-center">
+            <label class="form-label d-block" style="width: 150px; white-space: normal;">{{ question.text }}</label>
+            <div class="ms-3">
+                {% for choice in range(1, 6) %} 
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="questionb_{{ question.id }}" id="question_{{ question.id }}" value="{{ choice }}" required>
+                    <label class="form-check-label" for="question_{{ question.id }}">
+                        {{ choice }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- SEPARATE -->
+        <hr style="border: 10px solid #72281e; margin: 10px 0; border-radius: 10px;">
+      <h4>C. Teaching for Independent Learning</h4>
+      
+      {% for question in questionsc %} 
+        <div class="mb-3 d-flex align-items-center">
+            <label class="form-label d-block" style="width: 150px; white-space: normal;">{{ question.text }}</label>
+            <div class="ms-3">
+                {% for choice in range(1, 6) %} 
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="questionc_{{ question.id }}" id="question_{{ question.id }}" value="{{ choice }}" required>
+                    <label class="form-check-label" for="question_{{ question.id }}">
+                        {{ choice }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+
+        <!-- SEPARATE -->
+        <hr style="border: 10px solid #72281e; margin: 10px 0; border-radius: 10px;">
+      <h4>D. Management of Learning</h4>
+      
+      {% for question in questionsd %} 
+        <div class="mb-3 d-flex align-items-center">
+            <label class="form-label d-block" style="width: 150px; white-space: normal;">{{ question.text }}</label>
+            <div class="ms-3">
+                {% for choice in range(1, 6) %} 
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="questiond_{{ question.id }}" id="question_{{ question.id }}" value="{{ choice }}" required>
+                    <label class="form-check-label" for="question_{{ question.id }}">
+                        {{ choice }}
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        {% endfor %}
+        
+   
+        <hr style="border: 10px solid #72281e; margin: 10px 0; border-radius: 10px;">
+      <div class="mb-3">
+        <label for="comments" class="form-label">Comments</label>
+        <textarea class="form-control" id="comments" name="comments" rows="4" required></textarea>
+      </div>
+
+      
+      <button type="submit" class="btn btn-primary">Submit</button>
+    </form>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+          const campusSelect = document.getElementById("campus");
+          const collegeSelect = document.getElementById("college");
+          const programSelect = document.getElementById("program");
+          const facultySelect = document.getElementById("faculty");
+          const yearSelect = document.getElementById("year");
+      
+          // Original options for resetting
+          const collegeOptions = Array.from(collegeSelect.options);
+          const programOptions = Array.from(programSelect.options);
+          const facultyOptions = Array.from(facultySelect.options);
+      
+          // Filter college options based on campus
+          campusSelect.addEventListener("change", function () {
+              const selectedCampus = this.value;
+              collegeSelect.innerHTML = "";
+      
+              const filteredColleges = collegeOptions.filter(option =>
+                  option.dataset.campus === selectedCampus
+              );
+              filteredColleges.forEach(option => collegeSelect.appendChild(option));
+              collegeSelect.insertAdjacentHTML("afterbegin", '<option selected disabled>Open this select menu</option>');
+              collegeSelect.dispatchEvent(new Event("change")); // Trigger change for program filtering
+          });
+      
+          // Filter program options based on college/department
+          collegeSelect.addEventListener("change", function () {
+              const selectedCollege = this.value;
+              programSelect.innerHTML = "";
+      
+              const filteredPrograms = programOptions.filter(option =>
+                  option.dataset.college === selectedCollege
+              );
+              filteredPrograms.forEach(option => programSelect.appendChild(option));
+              programSelect.insertAdjacentHTML("afterbegin", '<option selected disabled>Open this select menu</option>');
+              programSelect.dispatchEvent(new Event("change")); // Trigger change for faculty filtering
+          });
+      
+          // Filter faculty options based on college/department
+          collegeSelect.addEventListener("change", function () {
+              const selectedCollege = this.value;
+              facultySelect.innerHTML = "";
+      
+              const filteredFaculty = facultyOptions.filter(option =>
+                  option.dataset.college === selectedCollege
+              );
+              filteredFaculty.forEach(option => facultySelect.appendChild(option));
+              facultySelect.insertAdjacentHTML("afterbegin", '<option selected disabled>Open this select menu</option>');
+          });
+      
+          // Adjust year level options based on program selection
+          programSelect.addEventListener("change", function () {
+              const selectedProgram = programSelect.options[programSelect.selectedIndex]?.text;
+              yearSelect.innerHTML = "";
+      
+              // If the selected program matches the specific value
+              if (selectedProgram === "Bachelor of Science In Agricultural and Biosystems Engineering") {
+                  yearSelect.insertAdjacentHTML("beforeend", `
+                      <option>I</option>
+                      <option>II</option>
+                      <option>III</option>
+                      <option>IV</option>
+                      <option>V</option>
+                  `);
+              } else {
+                  // Default to Year 1-4
+                  yearSelect.insertAdjacentHTML("beforeend", `
+                      <option>I</option>
+                      <option>II</option>
+                      <option>III</option>
+                      <option>IV</option>
+                  `);
+              }
+              yearSelect.insertAdjacentHTML("afterbegin", '<option selected disabled>Open this select menu</option>');
+          });
+      });
+      </script>
+      
+    
+  </div>
+{% endblock %}

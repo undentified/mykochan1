@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<body>
+    <h1 style="text-align: center;">Sentiment Analysis by Faculty</h1>
+    <div id="table-container">
+        <table border="1" cellpadding="10" cellspacing="0" id="sentimentTable" class="sortable-table">
+            <thead>
+                <tr>
+                    <th onclick="sortTable(0, this)">Faculty <span class="sort-indicator">⬍</span></th>
+                    <th onclick="sortTable(1, this)">Positive Ratings <span class="sort-indicator">⬍</span></th>
+                    <th onclick="sortTable(2, this)">Neutral Ratings <span class="sort-indicator">⬍</span></th>
+                    <th onclick="sortTable(3, this)">Negative Ratings <span class="sort-indicator">⬍</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for result in results %}
+                <tr>
+                    <td>{{ result.faculty }}</td>
+                    <td>{{ result.positive }}</td>
+                    <td>{{ result.neutral }}</td>
+                    <td>{{ result.negative }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <button onclick="downloadTableAsImage()">Download Report as Image</button>
+
+    <style>
+        /* Table styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px auto;
+            text-align: center;
+        }
+
+        th, td {
+            padding: 10px;
+        }
+
+        th {
+            background-color: #000000;
+            color: white;
+            cursor: pointer;
+        }
+
+        th:hover {
+            background-color: #6c6c6c;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        .sort-indicator {
+            font-size: 12px;
+            margin-left: 5px;
+            color: white;
+        }
+
+        th.sorted-asc .sort-indicator::after {
+            content: "▼";
+        }
+
+        th.sorted-desc .sort-indicator::after {
+            content: "▲";
+        }
+
+        /* Button styling */
+        button {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #6c6c6c;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #545454;
+        }
+    </style>
+
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script>
+        // Sorting script
+        function sortTable(columnIndex, headerElement) {
+            const table = document.getElementById("sentimentTable");
+            const rows = Array.from(table.rows).slice(1); // Skip the header row
+            const isAscending = headerElement.classList.contains("sorted-desc");
+
+            // Reset all headers
+            document.querySelectorAll(".sortable-table th").forEach(th => {
+                th.classList.remove("sorted-asc", "sorted-desc");
+            });
+
+            // Add appropriate class to the clicked header
+            headerElement.classList.add(isAscending ? "sorted-asc" : "sorted-desc");
+
+            // Sort rows
+            rows.sort((a, b) => {
+                const aText = a.cells[columnIndex].innerText;
+                const bText = b.cells[columnIndex].innerText;
+
+                // Check if the content is numeric or text
+                const aValue = isNaN(aText) ? aText.toLowerCase() : parseFloat(aText);
+                const bValue = isNaN(bText) ? bText.toLowerCase() : parseFloat(bText);
+
+                if (aValue < bValue) return isAscending ? -1 : 1;
+                if (aValue > bValue) return isAscending ? 1 : -1;
+                return 0;
+            });
+
+            // Reattach sorted rows to the table
+            const tbody = table.querySelector("tbody");
+            rows.forEach(row => tbody.appendChild(row));
+        }
+
+        // Download table as an image
+        function downloadTableAsImage() {
+            const tableContainer = document.getElementById("table-container");
+
+            // Use html2canvas to capture the table
+            html2canvas(tableContainer).then(canvas => {
+                // Create a link element to download the image
+                const link = document.createElement("a");
+                link.download = "sentiment_analysis_report.png"; // File name
+                link.href = canvas.toDataURL("image/png");
+                link.click(); // Trigger download
+            });
+        }
+    </script>
+</body>
+{% endblock %}

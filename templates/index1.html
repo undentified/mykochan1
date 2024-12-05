@@ -1,0 +1,49 @@
+document.addEventListener("DOMContentLoaded", function () {
+    const campusSelect = document.getElementById("campus");
+    const collegeSelect = document.getElementById("college");
+    const programSelect = document.getElementById("program");
+    const facultySelect = document.getElementById("faculty");
+
+    // Original options for resetting
+    const collegeOptions = Array.from(collegeSelect.options);
+    const programOptions = Array.from(programSelect.options);
+    const facultyOptions = Array.from(facultySelect.options);
+
+    // Filter college options based on campus
+    campusSelect.addEventListener("change", function () {
+      const selectedCampus = this.value;
+      collegeSelect.innerHTML = "";
+
+      const filteredColleges = collegeOptions.filter((option) =>
+        option.text.includes(`Campus: ${selectedCampus}`)
+      );
+      filteredColleges.forEach((option) => collegeSelect.appendChild(option));
+      collegeSelect.insertAdjacentHTML("afterbegin", '<option selected disabled>Open this select menu</option>');
+      collegeSelect.dispatchEvent(new Event("change")); // Trigger change for program filtering
+    });
+
+    // Filter program options based on college/department
+    collegeSelect.addEventListener("change", function () {
+      const selectedCollege = this.value;
+      programSelect.innerHTML = "";
+
+      const filteredPrograms = programOptions.filter((option) =>
+        option.text.includes(`College/Department: ${selectedCollege}`)
+      );
+      filteredPrograms.forEach((option) => programSelect.appendChild(option));
+      programSelect.insertAdjacentHTML("afterbegin", '<option selected disabled>Open this select menu</option>');
+      programSelect.dispatchEvent(new Event("change")); // Trigger change for faculty filtering
+    });
+
+    // Filter faculty options based on college/department
+    collegeSelect.addEventListener("change", function () {
+      const selectedCollege = this.value;
+      facultySelect.innerHTML = "";
+
+      const filteredFaculty = facultyOptions.filter((option) =>
+        option.text.includes(`College: ${selectedCollege}`)
+      );
+      filteredFaculty.forEach((option) => facultySelect.appendChild(option));
+      facultySelect.insertAdjacentHTML("afterbegin", '<option selected disabled>Open this select menu</option>');
+    });
+  });

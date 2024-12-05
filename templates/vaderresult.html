@@ -1,0 +1,90 @@
+{% extends 'base.html' %}
+
+{% block title %}
+<title>
+Sentiment Analysis and Response Statistics
+</title>
+{% endblock %}
+
+{% block content %}
+    <h1>Sentiment Analysis and Response Summary</h1>
+    
+    <div class="d-flex flex-column align-items-center mt-3" id="imageContainer">
+        <img id="sentimentImage" alt="" class="mr-3" style="width: 200px;">
+        <span id="sentimentText" class="h5"></span>
+        <span id="additionalText" class="ml-5"></span>
+    </div>
+      
+            <canvas id="sentimentChart" width="400" height="50"></canvas>
+       
+
+        
+   
+    <div class="ml-5 d-flex flex-column align-items-center">
+        <span class="display-4">Rating average</span>
+        <span id="averageAnswerText" class="display-5">{{ average_answer }}</span>
+        <span id="Totalresponses" class="display-6">Total responses: {{ num_inputs }}</span>
+    </div>
+
+    <script>
+        var averageScore = {{ average_score|tojson|safe }};
+        var averageAnswer = {{ average_answer|tojson|safe }};
+
+        var ctx = document.getElementById('sentimentChart').getContext('2d');
+        var sentimentChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Average Sentiment Score'], 
+                datasets: [{
+                    label: 'Sentiment Score',
+                    data: [averageScore],  
+                    backgroundColor: averageScore >= 0 ? 'rgba(39, 114, 245, 1)' : 'rgba(255, 99, 132, 1)',
+                    borderColor: averageScore >= 0 ? 'rgba(75, 192, 192, 1)' : 'rgba(255, 99, 132, 1)',
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                scales: {
+                    y: {
+                        display: false 
+            },
+                    x: {
+                        beginAtZero: true,
+                        min: -1.0, 
+                        max: 1.0
+                    }
+                }
+            }
+        });
+
+        var img = document.getElementById('sentimentImage');
+        var stext = document.getElementById('sentimentText');
+
+        if (averageScore >= 0.7 && averageScore <= 1.0) {
+    img.src = '/static/very_positive.png';
+    img.alt = 'Very Positive Sentiment';
+    stext.innerText = 'Overall sentiment is very positive!';
+} else if (averageScore >= 0.21 && averageScore < 0.7) {
+    img.src = '/static/positive.png';
+    img.alt = 'Positive Sentiment';
+    stext.innerText = 'Overall sentiment is positive.';
+} else if (averageScore >= -0.2 && averageScore <= 0.2) {
+    img.src = '/static/neutral.png';
+    img.alt = 'Neutral Sentiment';
+    stext.innerText = 'Overall sentiment is neutral.';
+} else if (averageScore >= -0.69 && averageScore < -0.21) {
+    img.src = '/static/negative.png';
+    img.alt = 'Negative Sentiment';
+    stext.innerText = 'Overall sentiment is negative.';
+} else if (averageScore >= -1.0 && averageScore <= -0.7) {
+    img.src = '/static/very_negative.png';
+    img.alt = 'Very Negative Sentiment';
+    stext.innerText = 'Overall sentiment is very negative.';
+}
+
+
+        document.getElementById('averageAnswerText').innerText = averageAnswer.toFixed(2);
+        document.getElementById('Totalresponses').innerText = num_inputs.toFixed(2);
+    </script>
+{% endblock %}
